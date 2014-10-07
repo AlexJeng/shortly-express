@@ -4,8 +4,11 @@ Shortly.LoginView = Backbone.View.extend({
   template: Templates['login'],
 
   render: function() {
+    console.log(this);
     // this.model.attributes maybe
-    this.$el.html(this.template);
+    // append(this.template);
+    debugger;
+    this.$el.append(this.template());
     return this;
   }
 });

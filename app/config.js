@@ -47,19 +47,19 @@ db.knex.schema.hasTable('clicks').then(function(exists) {
 /************************************************************/
 
 // username & password
-/*
+
 db.knex.schema.hasTable('users').then(function(exists) {
   if (!exists) {
-    db.knex.schema.createTable('users', function (click) {
-      users.increments('id').primary();
-      users.string('password', 255);
-      users.string('username', 255);
-      users.integer('link_id');
-      users.timestamps();
+    db.knex.schema.createTable('users', function (user) {
+      user.increments('id').primary();
+      user.string('password', 255);
+      user.string('username', 255);
+      user.integer('link_id');
+      user.timestamps();
     }).then(function (table) {
       console.log('Created Table', table);
     });
   }
 });
-*/
+
 module.exports = db;

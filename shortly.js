@@ -2,7 +2,7 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
-
+var session = require('express-session');
 
 var db = require('./app/config');
 var Users = require('./app/collections/users');
@@ -21,19 +21,27 @@ app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+app.use(session({secret:'lalalalla'}));
 
+var checkUser = function(req,res,next){
+  if (req.session.user) { //if log in session exists, go to ind
+    next();
+  } else { //else go to /login page
+    res.redirect('login');
+  }
 
-app.get('/',
+}
+app.get('/',checkUser,
 function(req, res) {
   res.render('index');
 });
 
-app.get('/create',
+app.get('/create',checkUser,
 function(req, res) {
   res.render('index');
 });
 
-app.get('/links',
+app.get('/links',checkUser,
 function(req, res) {
   Links.reset().fetch().then(function(links) {
     res.send(200, links.models);
@@ -47,11 +55,39 @@ app.get('/login',
 function(req, res) {
   res.render('login');
 });
+app.post('/login',
+function(req, res) {
+  req.session.user = 'person';
+  res.send('/');
+  // check that login is correct and write user to the session
+});
 
 app.get('/signup',
 function(req, res) {
   res.render('signup');
   // do some authentication probably
+});
+
+app.post('/login', function(request, response) {
+
+    var username = request.body.username;
+    var password = request.body.password;
+
+    if(username == 'demo' && password == 'demo'){
+        request.session.regenerate(function(){
+        request.session.user = username;
+        response.redirect('/links');
+        });
+    }
+    else {
+       res.redirect('login');
+    }
+});
+
+app.get('/logout', function(request, response){
+    request.session.destroy(function(){
+        response.redirect('/');
+    });
 });
 
 
