@@ -24,13 +24,13 @@ app.use(express.static(__dirname + '/public'));
 app.use(session({secret:'lalalalla'}));
 
 var checkUser = function(req,res,next){
-  req.session.user ? next() : res.redirect('login');
+  req.session.user ? next() : res.redirect('/login');
   // if (req.session.user) { //if log in session exists, go to ind
   //   next();
   // } else { //else go to /login page
   //   res.redirect('login');
   // }
-}
+};
 app.get('/',checkUser,
 function(req, res) {
   res.render('index');
@@ -81,16 +81,18 @@ app.post('/login', function(request, response) {
         if (names[0]) {
           console.log("names[0] matches username");
           request.session.user = username;
-          response.redirect('index');
+          response.redirect('/');
         } else {
-          throw error ("invalid user");
+          console.log("invalid user");
+          response.redirect('/login');
+          // throw new Error('invalid user');
         }
       })
-    })
-    .catch(function(error) {
-      console.log("login failed: ", error );
-      response.redirect('login');      
     });
+    // .catch(function(error) {
+    //   console.log("login failed: ", error );
+    //   response.redirect('/login');
+    // });
 
 });
 
@@ -107,12 +109,12 @@ app.post('/signup', function(request, response) {
       request.session.regenerate(function(){
         request.session.user = user;
         console.log("signup succe", names)
-        response.redirect('index');
+        response.redirect('/');
       })
     })
     .catch(function(error) {
       console.log("error at signup");
-      response.redirect('signup');      
+      response.redirect('signup');
     })
 });
 
