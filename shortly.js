@@ -24,12 +24,12 @@ app.use(express.static(__dirname + '/public'));
 app.use(session({secret:'lalalalla'}));
 
 var checkUser = function(req,res,next){
-  if (req.session.user) { //if log in session exists, go to ind
-    next();
-  } else { //else go to /login page
-    res.redirect('login');
-  }
-
+  req.session.user ? next() : res.redirect('login');
+  // if (req.session.user) { //if log in session exists, go to ind
+  //   next();
+  // } else { //else go to /login page
+  //   res.redirect('login');
+  // }
 }
 app.get('/',checkUser,
 function(req, res) {
@@ -68,11 +68,13 @@ function(req, res) {
   // do some authentication probably
 });
 
+//this code should execute after logging in
 app.post('/login', function(request, response) {
 
     var username = request.body.username;
     var password = request.body.password;
 
+    //if username && password exists in db
     if(username == 'demo' && password == 'demo'){
         request.session.regenerate(function(){
         request.session.user = username;
@@ -84,12 +86,29 @@ app.post('/login', function(request, response) {
     }
 });
 
+app.post('/signup', function(request, response) {
+
+    var username = request.body.username;
+    var password = request.body.password;
+
+    //if username && password exists in db
+    if(username == 'demo' && password == 'demo'){
+        request.session.regenerate(function(){
+        request.session.user = username;
+        response.redirect('/links');
+        });
+    }
+    else {
+       res.redirect('login');
+    }
+});
+
+
 app.get('/logout', function(request, response){
     request.session.destroy(function(){
         response.redirect('/');
     });
 });
-
 
 app.post('/links',
 function(req, res) {
