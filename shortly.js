@@ -82,7 +82,7 @@ app.post('/login', function(request, response) {
         });
     }
     else {
-       res.redirect('login');
+       response.redirect('login');
     }
 });
 
@@ -91,16 +91,10 @@ app.post('/signup', function(request, response) {
     var username = request.body.username;
     var password = request.body.password;
 
-    //if username && password exists in db
-    if(username == 'demo' && password == 'demo'){
-        request.session.regenerate(function(){
-        request.session.user = username;
-        response.redirect('/links');
-        });
-    }
-    else {
-       res.redirect('login');
-    }
+    console.log('username = ', username);
+    console.log('password = ', password);
+    db.knex('users').insert({username:username}, {password:password});
+    response.redirect('login');
 });
 
 
