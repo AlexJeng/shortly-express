@@ -120,9 +120,11 @@ app.post('/signup', function(request, response) {
 
 
 app.get('/logout', function(request, response){
-    request.session.destroy(function(){
-        response.redirect('/');
-    });
+  console.log('logout clicked');
+  request.session.destroy(function(err){
+    console.log('session destroyed:', err);
+    response.render('logout');
+  });
 });
 
 app.post('/links',
