@@ -55,12 +55,6 @@ app.get('/login',
 function(req, res) {
   res.render('login');
 });
-app.post('/login',
-function(req, res) {
-  req.session.user = 'person';
-  res.send('/');
-  // check that login is correct and write user to the session
-});
 
 app.get('/signup',
 function(req, res) {
@@ -74,27 +68,52 @@ app.post('/login', function(request, response) {
     var username = request.body.username;
     var password = request.body.password;
 
-    //if username && password exists in db
-    if(username == 'demo' && password == 'demo'){
-        request.session.regenerate(function(){
-        request.session.user = username;
-        response.redirect('/links');
-        });
-    }
-    else {
-       response.redirect('login');
-    }
+    console.log("inputted username: ", username);
+    console.log("inputted password: ", password);
+
+    db.knex('users').select('username')
+      .where('username', username)
+      .andWhere('password', password)
+    .then( function (names) {
+      console.log("database found username/pw");
+      request.session.regenerate(function(){
+        console.log("login successful, what is names?:", names);
+        if (names[0]) {
+          console.log("names[0] matches username");
+          request.session.user = username;
+          response.redirect('index');
+        } else {
+          throw error ("invalid user");
+        }
+      })
+    })
+    .catch(function(error) {
+      console.log("login failed: ", error );
+      response.redirect('login');      
+    });
+
 });
 
 app.post('/signup', function(request, response) {
 
-    var username = request.body.username;
-    var password = request.body.password;
+    var user = request.body.username;
+    var pass = request.body.password;
 
-    console.log('username = ', username);
-    console.log('password = ', password);
-    db.knex('users').insert({username:username}, {password:password});
-    response.redirect('login');
+    console.log('username = ', user);
+    console.log('password = ', pass);
+
+    db.knex('users').insert({password:pass, username:user})
+    .then( function (names) {
+      request.session.regenerate(function(){
+        request.session.user = user;
+        console.log("signup succe", names)
+        response.redirect('index');
+      })
+    })
+    .catch(function(error) {
+      console.log("error at signup");
+      response.redirect('signup');      
+    })
 });
 
 
